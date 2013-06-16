@@ -1,0 +1,11 @@
+<tileset>
+   <texturefile path="tileset.png">
+      <tile x="0" y="0" frames="1" id="0" />
+      <tile x="1" y="0" frames="1" id="1" />
+      <tile x="2" y="0" frames="1" id="2" />
+      <tile x="3" y="0" frames="1" id="3" />
+      <tile x="4" y="0" frames="1" id="4" />
+      <tile x="5" y="0" frames="1" id="5" />
+      <tile x="6" y="0" frames="1" id="6" />
+   </texturefile>
+</tileset>

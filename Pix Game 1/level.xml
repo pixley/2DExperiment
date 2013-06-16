@@ -1,0 +1,7 @@
+<level width="20" height="20">
+   <tileset path="tileset.xml" />
+   <tile x="0" y="0" baseid="0" walkable="false" />
+   <tile x="1" y="0" baseid="0" walkable="true" />
+   <tile x="2" y="0" baseid="1" walkable="true" />
+   <tile x="3" y="0" baseid="1" walkable="false" />
+</level>

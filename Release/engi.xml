@@ -1,0 +1,5 @@
+<entity name="MaleEngineer">
+   <spritesheet w="640" h="400" path="Engi.png" id="0" />
+   <validAct look="true" talk="true" attack="true" take="false" steal="false" overturn="false" use="false" disable="true" hack="false" climb="false" jump="false" lift="true" unlock="false" lock="false" board="false" repair="false" heal="false" extinguish="false" read="true" move="true" pilot="false" loot="false" inspect="true" />
+   <describer dir="0" x="3" y="4" />
+</entity>
