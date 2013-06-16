@@ -87,7 +87,7 @@ void Engine::RenderFrame()
 				{
 					currentLevel->DrawSelectBorder((x * TILESIZE) - camOffsetX, (y * TILESIZE) - camOffsetY, window);
 				}
-				else if(currentLevel->IsHoveredTile(tile))
+				else if(currentLevel->IsHoveredTile(tile) && actionMode)
 				{
 					currentLevel->DrawHoverBorder((x * TILESIZE) - camOffsetX, (y * TILESIZE) - camOffsetY, window);
 				}
@@ -121,7 +121,7 @@ void Engine::ProcessInput()
 		if(evt.type == sf::Event::Closed)
 			window->close();
 		
-		if((evt.type == sf::Event::MouseButtonPressed) && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		if((evt.type == sf::Event::MouseButtonPressed) && sf::Mouse::isButtonPressed(sf::Mouse::Left) && actionMode)
 		{
 			int x = camera->GetPosition().x + sf::Mouse::getPosition(*window).x;
 			int y = camera->GetPosition().y + sf::Mouse::getPosition(*window).y;
@@ -145,7 +145,10 @@ void Engine::ProcessInput()
 			if(!actionMode)
 				actionMode = true;
 			else
+			{
 				actionMode = false;
+				currentLevel->ClearSelect();
+			}
 		}
 	}
 }
