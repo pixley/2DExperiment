@@ -1,6 +1,8 @@
 #include "engine.h"
 #include "tile.h"
 #include "texturemanager.h"
+#include "actor.h"
+#include "entity.h"
 #include <SFML\Graphics.hpp>
 #include <string>
 
@@ -87,23 +89,40 @@ void Engine::RenderFrame()
 				{
 					currentLevel->DrawSelectBorder((x * TILESIZE) - camOffsetX, (y * TILESIZE) - camOffsetY, window);
 				}
-				else if(currentLevel->IsHoveredTile(tile) && actionMode)
+				if(currentLevel->IsHoveredTile(tile) && actionMode)
 				{
 					currentLevel->DrawHoverBorder((x * TILESIZE) - camOffsetX, (y * TILESIZE) - camOffsetY, window);
+				}
+				if(actionMode && currentLevel->GetSelectedActor())
+				{
+					currentLevel->DrawMoveSprites((x * TILESIZE) - camOffsetX, (y * TILESIZE) - camOffsetY, currentLevel->GetSelectedActor()->GetSpeed(), tile, window);
 				}
 				else if(actionMode)
 				{
 					currentLevel->DrawGridSprite((x * TILESIZE) - camOffsetX, (y * TILESIZE) - camOffsetY, window);
 				}
+			}
+		}
+	}
 
+	for (y = 0, tileY = bounds.top; y < bounds.height; y++, tileY++)
+	{
+		for (x = 0, tileX = bounds.left; x < bounds.width; x++, tileX++)
+		{
+			//get the tile being drawn
+			tile = currentLevel->GetTile(tileX, tileY);
+			if(tile)
+			{
 				Entity* occupant = tile->GetOccupant();
 				if (occupant)
 				{
-					float occupantX = occupant->GetRealPosition().x;
-					float occupantY = occupant->GetRealPosition().y;
-					float camX = camera->GetRealPosition().x;
-					float camY = camera->GetRealPosition().y;
-					occupant->Draw((int)(occupantX - camX), (int)(occupantY - camY), window);
+					occupant->Draw(window, camera->GetRealPosition().x, camera->GetRealPosition().y);
+				}
+	            
+				Actor* domOccupant = tile->GetDomOccupant();
+				if(domOccupant)
+				{
+					domOccupant->Draw(window, camera->GetRealPosition().x, camera->GetRealPosition().y);
 				}
 			}
 		}
@@ -128,7 +147,7 @@ void Engine::ProcessInput()
 			
 			Tile* tile = currentLevel->GetTile(x / TILESIZE, y / TILESIZE);
 			currentLevel->SelectTile(tile);
-			camera->GoToCenter(x - (x % TILESIZE), y - (y % TILESIZE));
+			camera->GoToCenter(x , y);
 		}
 
 		if(evt.type == sf::Event::MouseMoved)
@@ -140,15 +159,51 @@ void Engine::ProcessInput()
 			currentLevel->HoverTile(tile);
 		}
 
-		if((evt.type == sf::Event::KeyPressed) && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		if((evt.type == sf::Event::KeyPressed) && sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
 		{
 			if(!actionMode)
+			{
 				actionMode = true;
+				currentLevel->ClearNodes();
+			}
 			else
 			{
 				actionMode = false;
 				currentLevel->ClearSelect();
+				currentLevel->ClearSelectedActor();
 			}
+		}
+
+		if((evt.type == sf::Event::KeyPressed) && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		{
+			Tile* selectedTile = currentLevel->GetSelectedTile();
+			Actor* selectedActor = currentLevel->GetSelectedActor();
+			if(actionMode && selectedTile && selectedActor && selectedTile->IsReachable(selectedActor->GetSpeed()))
+			{
+				int x0 = selectedActor->GetPosition().x;
+				int y0 = selectedActor->GetPosition().y;
+				int x1 = selectedTile->GetLoc().x;
+				int y1 = selectedTile->GetLoc().y;
+				selectedTile->SetPath(currentLevel->Pathfind(x0, y0, x1, y1, selectedActor->GetSpeed()));
+				selectedActor->SetDest(x1, y1);
+				currentLevel->ClearSelect();
+				currentLevel->ClearSelectedActor();
+				actionMode = false;
+			} else if (actionMode && selectedTile)
+			{
+				selectedActor = selectedTile->GetDomOccupant();
+				if(selectedActor)
+				{
+					currentLevel->SetSelectedActor(selectedActor);
+					currentLevel->ClearNodes();
+					currentLevel->GetPaths(selectedActor->GetPosition().x, selectedActor->GetPosition().y, selectedActor->GetSpeed());
+				}
+			}
+		}
+
+		if((evt.type == sf::Event::KeyPressed) && sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+		{
+			currentLevel->ClearSelectedActor();
 		}
 	}
 }
@@ -156,6 +211,8 @@ void Engine::ProcessInput()
 void Engine::Update()
 {
 	camera->Update();
+	if(!actionMode)
+		currentLevel->Update();
 }
 
 void Engine::MainLoop()

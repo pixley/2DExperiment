@@ -2,9 +2,9 @@
 #define _CAMERA_H
 
 #include <SFML\Graphics.hpp>
-#include "tile.h"
 #include "level.h"
 
+//The camera through which the level is viewed.
 class Camera
 {
 private:

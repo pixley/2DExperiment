@@ -4,6 +4,7 @@
 #include <fstream>
 #include "rapidxml\rapidxml.hpp"
 #include "texturemanager.h"
+#include "camera.h"
 
 Entity::Entity()
 {
@@ -23,40 +24,10 @@ Entity::~Entity()
 
 }
 
-void Entity::LoadEntity(rapidxml::xml_node<>* entityXml)
+void Entity::LoadEntity(rapidxml::xml_node<>* root)
 {
-	//****************
-	//Begin XML readin
-	//****************
-
-	//get XML filename
-	std::string filename = entityXml->first_attribute("path", 0, true)->value();
-	//load XML file
-	std::ifstream inFile;
-	inFile.open(filename);
-
-	if(!inFile)
-		throw "Could not load entity";
-
-	std::string line;
-	std::string xmlContents;
-	while(std::getline(inFile, line))
-		xmlContents += line;
-
-	//Convert string to RapidXML-readable char pointer
-	std::vector<char> xmlData = std::vector<char>(xmlContents.begin(), xmlContents.end());
-	xmlData.push_back('\0');
-
-	//create parsed document with &XMLDATA[0], which is equialent to char pointer
-	rapidxml::xml_document<> doc;
-	doc.parse<rapidxml::parse_no_data_nodes>(&xmlData[0]);
-
-	//get root node
-	rapidxml::xml_node<>* root = doc.first_node("entity", 0, true);
-
-	//****************
-	//End XML readin
-	//****************
+	if(!root)
+		throw "Entity XML file not found";
 
 	//set name
 	name = root->first_attribute("name", 0, true)->value();
@@ -105,6 +76,8 @@ void Entity::LoadEntity(rapidxml::xml_node<>* entityXml)
 
 void Entity::loadSpriteSheets(rapidxml::xml_node<>* spritesheet)
 {
+	if(!spritesheet)
+		throw "No reference to spritesheet";
 	while(spritesheet)
 	{
 		int w = atoi(spritesheet->first_attribute("w", 0, true)->value());
@@ -112,7 +85,7 @@ void Entity::loadSpriteSheets(rapidxml::xml_node<>* spritesheet)
 		//load spritesheet
 		textureManager.LoadSpriteSheet(spritesheet, w, h);
 
-		spritesheet = spritesheet->next_sibling("spritesheet, 0, true");
+		spritesheet = spritesheet->next_sibling("spritesheet", 0, true);
 	}
 
 	baseSprite.setTexture(textureManager.GetTexture(0), false);
@@ -120,6 +93,8 @@ void Entity::loadSpriteSheets(rapidxml::xml_node<>* spritesheet)
 
 void Entity::loadValidActions(rapidxml::xml_node<>* validAct)
 {
+	if(!validAct)
+		throw "No reference to valid actions";
 	actions[LOOK] = (validAct->first_attribute("look", 0, true)->value() == "true") ? true : false;
 	actions[TALK] = (validAct->first_attribute("talk", 0, true)->value() == "true") ? true : false;
 	actions[ATTACK] = (validAct->first_attribute("attack", 0, true)->value() == "true") ? true : false;
@@ -137,12 +112,17 @@ void Entity::loadValidActions(rapidxml::xml_node<>* validAct)
 	actions[BOARD] = (validAct->first_attribute("board", 0, true)->value() == "true") ? true : false;
 	actions[REPAIR] = (validAct->first_attribute("repair", 0, true)->value() == "true") ? true : false;
 	actions[HEAL] = (validAct->first_attribute("heal", 0, true)->value() == "true") ? true : false;
-	actions[EXTINGUISH] = (validAct->first_attribute("extinguish", 0, true)->value() == "true") ? true : false;
+	actions[FIGHT_FIRE] = (validAct->first_attribute("fight_fire", 0, true)->value() == "true") ? true : false;
 	actions[READ] = (validAct->first_attribute("read", 0, true)->value() == "true") ? true : false;
 	actions[MOVE] = (validAct->first_attribute("move", 0, true)->value() == "true") ? true : false;
 	actions[PILOT] = (validAct->first_attribute("pilot", 0, true)->value() == "true") ? true : false;
 	actions[LOOT] = (validAct->first_attribute("loot", 0, true)->value() == "true") ? true : false;
 	actions[INSPECT] = (validAct->first_attribute("inspect", 0, true)->value() == "true") ? true : false;
+	actions[IGNITE] = (validAct->first_attribute("ignite", 0, true)->value() == "true") ? true : false;
+	actions[DEMOLISH] = (validAct->first_attribute("demolish", 0, true)->value() == "true") ? true : false;
+	actions[DISGUISE] = (validAct->first_attribute("disguise", 0, true)->value() == "true") ? true : false;
+	actions[CONCEAL] = (validAct->first_attribute("conceal", 0, true)->value() == "true") ? true : false;
+	actions[OBSERVE] = (validAct->first_attribute("observe", 0, true)->value() == "true") ? true : false;
 }
 
 bool Entity::Interact(interact action)
@@ -150,9 +130,9 @@ bool Entity::Interact(interact action)
 	return actions[action];
 }
 
-void Entity::Draw(int x, int y, sf::RenderWindow* rw)
+void Entity::Draw(sf::RenderWindow* rw, float camX, float camY)
 {
-	baseSprite.setPosition(x, y);
+	baseSprite.setPosition((int)(position.x - camX), (int)(position.y - camY));
 	rw->draw(baseSprite);
 }
 
@@ -164,4 +144,31 @@ sf::Vector2i Entity::GetPosition()
 sf::Vector2f Entity::GetRealPosition()
 {
 	return position;
+}
+
+void Entity::SetDir(int face)
+{
+	switch (face){
+	case 0:
+		dir = SOUTH;
+		break;
+	case 1:
+		dir = NORTH;
+		break;
+	case 2:
+		dir = EAST;
+		break;
+	case 3:
+		dir = WEST;
+		break;
+	default:
+		break;
+	}
+
+	baseSprite.setTextureRect(sf::IntRect(TILESIZE * dir, 0, TILESIZE, TILESIZE * 2));
+}
+
+int Entity::GetDir()
+{
+	return dir;
 }

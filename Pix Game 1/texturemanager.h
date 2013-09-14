@@ -10,6 +10,10 @@ using namespace std;
 
 const int TILESIZE = 40;
 
+/*
+Used to manage textures for both the level's tileset and for each entity by providing
+an interface with SFML graphical libraries.
+*/
 class TextureManager
 {
 private:

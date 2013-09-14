@@ -99,6 +99,10 @@ void TextureManager::LoadSpriteSheet(rapidxml::xml_node<>* spritesheet, int widt
 	sf::Texture sheet;
 	texturePath = spritesheet->first_attribute("path", 0, true)->value();
 	sheet.create(width, height);
+
+	if(texturePath.empty())
+		throw "Invalid texture path";
+
 	sheet.loadFromFile(texturePath);
 	
 	//get attributes

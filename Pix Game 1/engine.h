@@ -7,6 +7,10 @@
 #include "camera.h"
 #include "level.h"
 
+/*
+The game engine itself.  Handles display of game elements by way of calls to Level::Draw methods,
+updating of entities and the camera, and human input.
+*/
 class Engine
 {
 private:
