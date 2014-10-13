@@ -92,7 +92,7 @@ void TextureManager::LoadTileset(std::string filename)
 	}
 }
 
-void TextureManager::LoadSpriteSheet(rapidxml::xml_node<>* spritesheet, int width, int height)
+int TextureManager::LoadSpriteSheet(rapidxml::xml_node<>* spritesheet, int width, int height)
 {
 	//get texture file being parsed and load it
 	std::string texturePath;
@@ -110,4 +110,6 @@ void TextureManager::LoadSpriteSheet(rapidxml::xml_node<>* spritesheet, int widt
 
 	//Add texture to texture list
 	AddTexture(sheet, id);
+
+	return id;
 }

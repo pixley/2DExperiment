@@ -1,7 +1,8 @@
 <level width="20" height="20">
    <tileset path="tileset.xml" />
-   <entity path="engi.xml" />
-   <entity path="plt.xml" />
+   <actor path="engi.xml" />
+   <actor path="plt.xml" />
+   <actor path="lmjk.xml" />
    <tile x="0" y="0" baseid="1" walkable="false" />
    <tile x="1" y="0" baseid="1" walkable="false" />
    <tile x="2" y="0" baseid="1" walkable="false" />

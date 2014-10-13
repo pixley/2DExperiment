@@ -23,22 +23,8 @@ Camera::~Camera()
 
 }
 
-//void Camera::MoveChecker(int* x, int* y)
-//{
-//	if(*x < size.x / 2)
-//		*x = size.x / 2;
-//	if(*x > (currentLevel->GetWidth() * TILESIZE) - (size.x / 2))
-//		*x = (currentLevel->GetWidth() * TILESIZE) - (size.x / 2);
-//	if(*y < size.y / 2)
-//		*y = size.y / 2;
-//	if(*y > (currentLevel->GetHeight() * TILESIZE) - (size.y / 2))
-//		*y = (currentLevel->GetHeight() * TILESIZE) - (size.y / 2);
-//}
-
 void Camera::Move(int x, int y)
 {
-	//MoveChecker(&x, &y);
-
 	position.x = (float)x;
 	position.y = (float)y;
 
@@ -48,8 +34,6 @@ void Camera::Move(int x, int y)
 
 void Camera::MoveCenter(int x, int y)
 {
-	//MoveChecker(&x, &y);
-
 	x = x - (size.x / 2);
 	y = y - (size.y / 2);
 
@@ -62,16 +46,12 @@ void Camera::MoveCenter(int x, int y)
 
 void Camera::GoTo(int x, int y)
 {
-	//MoveChecker(&x, &y);
-
 	target.x = (float)x;
 	target.y = (float)y;
 }
 
 void Camera::GoToCenter(int x, int y)
 {
-	//MoveChecker(&x, &y);
-
 	x = x - (size.x / 2);
 	y = y - (size.y / 2);
 
@@ -129,12 +109,12 @@ void Camera::Update()
 	}
 }
 
-sf::Vector2i Camera::GetTileOffset(int tileSize)
+sf::Vector2i Camera::TileOffset(int tileSize)
 {
 	return sf::Vector2i((int)(position.x) % tileSize, (int)(position.y) % tileSize);
 }
 
-sf::IntRect Camera::GetTileBounds(int tileSize)
+sf::IntRect Camera::TileBounds(int tileSize)
 {
 	int x = (int)position.x / tileSize;
 	int y = (int)position.y / tileSize;

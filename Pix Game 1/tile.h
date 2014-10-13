@@ -35,6 +35,7 @@ public:
 	~Tile();
 
 	void Draw(int x, int y, sf::RenderWindow* rw);
+	void DrawOccupants(float x, float y, sf::RenderWindow* window);
 
 	bool IsWalkable();
 

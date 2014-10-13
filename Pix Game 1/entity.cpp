@@ -2,30 +2,16 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <fstream>
+#include <assert.h>
 #include "rapidxml\rapidxml.hpp"
 #include "texturemanager.h"
 #include "camera.h"
 
-Entity::Entity()
+Entity::Entity(rapidxml::xml_node<>* root, TextureManager& tm)
 {
-	position.x = 0;
-	position.y = 0;
+	anim = IDLE;
+	frame = 0;
 
-	tilePosition.x = 0;
-	tilePosition.y = 0;
-
-	name = "non-loaded entity";
-
-	dir = SOUTH;
-}
-
-Entity::~Entity()
-{
-
-}
-
-void Entity::LoadEntity(rapidxml::xml_node<>* root)
-{
 	if(!root)
 		throw "Entity XML file not found";
 
@@ -34,7 +20,7 @@ void Entity::LoadEntity(rapidxml::xml_node<>* root)
 
 	//Load all spritesheets and set first sheet
 	rapidxml::xml_node<>* spritesheet = root->first_node("spritesheet", 0, true);
-	loadSpriteSheets(spritesheet);
+	loadSpriteSheets(spritesheet, tm);
 
 	//load entity's valid actions
 	rapidxml::xml_node<>* validAct = root->first_node("validAct", 0, true);
@@ -74,21 +60,23 @@ void Entity::LoadEntity(rapidxml::xml_node<>* root)
 	position.y = (float)(tilePosition.y * TILESIZE);
 }
 
-void Entity::loadSpriteSheets(rapidxml::xml_node<>* spritesheet)
+Entity::~Entity()
+{
+
+}
+
+void Entity::loadSpriteSheets(rapidxml::xml_node<>* spritesheet, TextureManager& tm)
 {
 	if(!spritesheet)
 		throw "No reference to spritesheet";
-	while(spritesheet)
-	{
-		int w = atoi(spritesheet->first_attribute("w", 0, true)->value());
-		int h = atoi(spritesheet->first_attribute("h", 0, true)->value());
-		//load spritesheet
-		textureManager.LoadSpriteSheet(spritesheet, w, h);
 
-		spritesheet = spritesheet->next_sibling("spritesheet", 0, true);
-	}
+	int w = atoi(spritesheet->first_attribute("w", 0, true)->value());
+	int h = atoi(spritesheet->first_attribute("h", 0, true)->value());
 
-	baseSprite.setTexture(textureManager.GetTexture(0), false);
+	//load spritesheet
+	texIdx = tm.LoadSpriteSheet(spritesheet, w, h);
+	
+	baseSprite.setTexture(tm.GetTexture(texIdx), false);
 }
 
 void Entity::loadValidActions(rapidxml::xml_node<>* validAct)
@@ -148,27 +136,30 @@ sf::Vector2f Entity::GetRealPosition()
 
 void Entity::SetDir(int face)
 {
-	switch (face){
-	case 0:
-		dir = SOUTH;
-		break;
-	case 1:
-		dir = NORTH;
-		break;
-	case 2:
-		dir = EAST;
-		break;
-	case 3:
-		dir = WEST;
-		break;
-	default:
-		break;
-	}
+	dir = static_cast<facing>(face);
 
+	//Change the sprite's direction
 	baseSprite.setTextureRect(sf::IntRect(TILESIZE * dir, 0, TILESIZE, TILESIZE * 2));
 }
 
 int Entity::GetDir()
 {
 	return dir;
+}
+
+void Entity::SetAnim(int ani)
+{
+	assert((ani >= 0) && (ani <= MAX_FRAME));
+	anim = static_cast<animation>(ani);
+	frame = 0;
+}
+
+void Entity::AdvanceFrame()
+{
+	if (frame < MAX_FRAME)
+		frame++;
+	else
+		frame = 0;
+
+	baseSprite.setTextureRect(sf::IntRect(TILESIZE * anim + TILESIZE * dir, TILESIZE * 2 * frame, TILESIZE, TILESIZE * 2));
 }

@@ -48,10 +48,10 @@ public:
 	sf::Vector2f GetRealPosition() { return position; };
 
 	//Helper function for retreiving camera's offset from nearest tile
-	sf::Vector2i GetTileOffset(int tileSize);
+	sf::Vector2i TileOffset(int tileSize);
 
 	//Helper function for retreiving a rectangle defining which tiles are visible through camera
-	sf::IntRect GetTileBounds(int tileSize);
+	sf::IntRect TileBounds(int tileSize);
 };
 
 #endif

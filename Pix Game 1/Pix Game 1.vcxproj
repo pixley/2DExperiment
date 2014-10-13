@@ -81,6 +81,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="actor.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="entity.cpp" />
@@ -88,8 +89,10 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="texturemanager.cpp" />
     <ClCompile Include="tile.cpp" />
+    <ClCompile Include="tilenode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="actor.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="entity.h" />
@@ -97,6 +100,7 @@
     <ClInclude Include="rapidxml\rapidxml.hpp" />
     <ClInclude Include="texturemanager.h" />
     <ClInclude Include="tile.h" />
+    <ClInclude Include="tilenode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

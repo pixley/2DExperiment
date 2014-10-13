@@ -29,6 +29,17 @@ void Tile::Draw(int x, int y, sf::RenderWindow* rw)
 	rw->draw(baseSprite);
 }
 
+void Tile::DrawOccupants(float x, float y, sf::RenderWindow* window) {
+	if (occupant)
+	{
+		occupant->Draw(window, x, y);
+	}
+	if (domOccupant)
+	{
+		domOccupant->Draw(window, x, y);
+	}
+}
+
 bool Tile::IsWalkable()
 {
 	return walkable && (domOccupant == NULL);
@@ -102,7 +113,7 @@ void Tile::UpdatePriority(int x, int y)
 
 int Tile::Estimate(int x, int y)
 {
-	return sqrt((float)((x - loc.x) * (x - loc.x) + (y - loc.y) * (y - loc.y)));
+	return (int)sqrt((float)((x - loc.x) * (x - loc.x) + (y - loc.y) * (y - loc.y)));
 }
 
 void Tile::ClearNode()
@@ -129,6 +140,9 @@ bool Tile::IsClosed()
 
 void Tile::SetPath(int* directions)
 {
+	if (path)
+		delete path;
+
 	path = directions;
 }
 

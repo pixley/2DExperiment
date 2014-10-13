@@ -31,7 +31,7 @@ public:
 	void LoadTileset(string filename);
 
 	//loads spritesheet from XML file
-	void LoadSpriteSheet(rapidxml::xml_node<>* spritesheet, int width, int height);
+	int LoadSpriteSheet(rapidxml::xml_node<>* spritesheet, int width, int height);
 };
 
 #endif

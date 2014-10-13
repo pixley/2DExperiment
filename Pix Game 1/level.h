@@ -9,6 +9,7 @@
 #include "actor.h"
 #include "rapidxml\rapidxml.hpp"
 #include <SFML\Graphics.hpp>
+using namespace sf;
 
 //Direction helpers
 static int dx[4] = {0, 0, 1, -1};
@@ -38,58 +39,56 @@ private:
 
 	//Currently selected tile
 	Tile* selectedTile;
-	sf::Sprite selectorSprite;
+	Sprite selectorSprite;
 
-	//Currently selected actor
-	Actor* selectedActor;
+	//Currently targeted tile
+	Tile* targetedTile;
+	Sprite targetSprite;
+
 	//Sprite to indicate valid moves for selected actor
-	sf::Sprite moveSprite;
+	Sprite moveSprite;
 	//Sprite to indicate invalid moves for selected actor
-	sf::Sprite noMoveSprite;
+	Sprite noMoveSprite;
 
 	//Currently hovered tile
 	Tile* hoverTile;
-	sf::Sprite hoverSprite;
+	Sprite hoverSprite;
 
 	//Sprite to draw Action Mode grid
-	sf::Sprite gridSprite;
+	Sprite gridSprite;
 
 	void SetDimensions(int w, int h);
 
 	//Helper function for Update()
 	void UpdatePos(Actor* actor);
 
+	//Helper functions for Draw()
+	void DrawSelectBorder(int x, int y, sf::RenderWindow* window);
+	void DrawTargetBorder(int x, int y, sf::RenderWindow* window);
+	void DrawHoverBorder(int x, int y, sf::RenderWindow* window);
+	void DrawGridSprite(int x, int y, sf::RenderWindow* window);
+	void DrawMoveSprites(int x, int y, int speed, Tile* tile, sf::RenderWindow* window);
+
 public:
-	Level(int w, int h);
+	Level(std::string filename);
 	~Level();
+
+	//Drawing the level
+	void Draw(bool actionMode, Vector2i camOffset, IntRect bounds, Vector2f camPos, sf::RenderWindow* window);
 
 	//Tile creation and retreival
 	void AddTile(unsigned int x, unsigned int y, Tile* tile);
-	Tile* GetTile(unsigned int x, unsigned int y);
 
 	//Tile selection
-	void SelectTile(Tile* tile);
-	bool IsSelectedTile(Tile* tile);
+	void SelectTile(unsigned int x, unsigned int y);
 	void ClearSelect();
-	void DrawSelectBorder(int x, int y, sf::RenderWindow* window);
-	Tile* GetSelectedTile();
 
-	//Actor selection
-	Actor* GetSelectedActor();
-	void SetSelectedActor(Actor* actor);
-	void ClearSelectedActor();
+	//Tile targeting
+	void TargetTile(unsigned int x, unsigned int y);
 
 	//Tile hovering
-	void HoverTile(Tile* tile);
-	bool IsHoveredTile(Tile* tile);
-	void ClearHover();
-	void DrawHoverBorder(int x, int y, sf::RenderWindow* window);
+	void HoverTile(unsigned int x, unsigned int y);
 
-	//Tile grid
-	void DrawGridSprite(int x, int y, sf::RenderWindow* window);
-
-	//Show valid movement tiles
-	void DrawMoveSprites(int x, int y, int speed, Tile* tile, sf::RenderWindow* window);
 	void ClearNodes();
 	void OpenNodes();
 
@@ -105,14 +104,11 @@ public:
 	//Add actor to level
 	void AddActor(rapidxml::xml_node<>* root);
 
-	void LoadLevel(std::string filename);
-	void UnloadLevel();
-
-	int GetWidth();
-	int GetHeight();
-
 	//Update positions of actors in level
 	void Update();
+
+	//Switches to and from Action Mode
+	bool SwitchMode(bool actionMode);
 
 	bool ReachTile(Actor* actor, Tile* tile);
 
